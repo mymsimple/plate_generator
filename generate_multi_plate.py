@@ -188,8 +188,6 @@ if __name__ == '__main__':
 
     from tqdm import tqdm
 
-    for i in tqdm(range(10000)):
+    for i in tqdm(range(10)):
         img, number_xy, gt_plate_number, bg_color, is_double = generator.generate_plate()
-
-        if is_double and bg_color == 'yellow':
-            cv2.imwrite('multi_val/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
+        cv2.imwrite('multi_val/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
