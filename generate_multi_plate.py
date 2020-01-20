@@ -119,8 +119,7 @@ class MultiPlateGenerator:
         elif len(set(plate_number) & set(['学', '挂'])) > 0:
             bg_color = 'yellow'
 
-        # is_double = random_select([False] + [True] * 3)
-        is_double = True
+        is_double = random_select([False] + [True] * 3)
 
         if '使' in plate_number:
             bg_color = 'black_shi'
@@ -182,12 +181,73 @@ class MultiPlateGenerator:
 
         return img_plate_model, number_xy, plate_number, bg_color, is_double
 
+    def generate_plate_special(self, plate_number, bg_color, is_double, enhance=False):
+        """
+        生成特定号码、颜色车牌
+        :param plate_number: 车牌号码
+        :param bg_color: 背景颜色
+        :param is_double: 是否双层
+        :param enhance: 图像增强
+        :return: 车牌图
+        """
+        height = 220 if is_double else 140
+
+        # print(plate_number, height, bg_color, is_double)
+        number_xy = self.get_location_multi(plate_number, height)
+        img_plate_model = cv2.imread(os.path.join(self.adr_plate_model, '{}_{}.PNG'.format(bg_color, height)))
+        img_plate_model = cv2.resize(img_plate_model, (440 if len(plate_number) == 7 else 480, height))
+
+        for i in range(len(plate_number)):
+            if len(plate_number) == 8:
+                font_img = self.font_imgs['green_{}'.format(plate_number[i])]
+            else:
+                if '{}_{}'.format(height, plate_number[i]) in self.font_imgs:
+                    font_img = self.font_imgs['{}_{}'.format(height, plate_number[i])]
+                else:
+                    if i < 2:
+                        font_img = self.font_imgs['220_up_{}'.format(plate_number[i])]
+                    else:
+                        font_img = self.font_imgs['220_down_{}'.format(plate_number[i])]
+
+            if (i == 0 and plate_number[0] in letters) or plate_number[i] in ['警', '使', '领']:
+                is_red = True
+            elif i == 1 and plate_number[0] in letters and np.random.random(1) > 0.5:
+                # second letter of army plate
+                is_red = True
+            else:
+                is_red = False
+
+            if enhance:
+                k = np.random.randint(1, 6)
+                kernel = np.ones((k, k), np.uint8)
+                if np.random.random(1) > 0.5:
+                    font_img = np.copy(cv2.erode(font_img, kernel, iterations=1))
+                else:
+                    font_img = np.copy(cv2.dilate(font_img, kernel, iterations=1))
+
+            img_plate_model = copy_to_image_multi(img_plate_model, font_img,
+                                                  number_xy[i, :], bg_color, is_red)
+
+        # is_double = 'double' if is_double else 'single'
+        img_plate_model = cv2.blur(img_plate_model, (3, 3))
+
+        return img_plate_model
+
 
 if __name__ == '__main__':
+    # 车牌背景颜色
+    bg_color = 'white'
+    # 是否双层车牌
+    is_double = False
+    # 车牌号码
+    plate_number = '豫A9999警'
+
     generator = MultiPlateGenerator('plate_model', 'font_model')
+    img = generator.generate_plate_special(plate_number, bg_color, is_double)
 
-    from tqdm import tqdm
+    cv2.imwrite('{}.jpg'.format(plate_number), img)
 
-    for i in tqdm(range(10)):
-        img, number_xy, gt_plate_number, bg_color, is_double = generator.generate_plate()
-        cv2.imwrite('multi_val/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
+    # from tqdm import tqdm
+    # for i in tqdm(range(10)):
+    #     img, number_xy, gt_plate_number, bg_color, is_double = generator.generate_plate()
+    #     cv2.imwrite('multi_val/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
