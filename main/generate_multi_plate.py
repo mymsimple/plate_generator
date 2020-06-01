@@ -96,51 +96,56 @@ class MultiPlateGenerator:
         return self.location_xys['{}_{}_{}'.format(length, split_id, height)]
 
     def generate_plate_number(self):
-        rate = np.random.random(1)
-        if rate > 0.4:
-            plate_number = generate_plate_number_blue(length=random_select([7, 8]))
-        else:
-            generate_plate_number_funcs = [generate_plate_number_white,
-                                           generate_plate_number_yellow_xue,
-                                           generate_plate_number_yellow_gua,
-                                           generate_plate_number_black_gangao,
-                                           generate_plate_number_black_shi,
-                                           generate_plate_number_black_ling]
-            plate_number = random_select(generate_plate_number_funcs)()
+        #rate = np.random.random(1)
+        #if rate > 0.4:
+            #plate_number = generate_plate_number_blue(length=random_select([7, 8]))
+        # else:
+        #     generate_plate_number_funcs = [generate_plate_number_white,
+        #                                    generate_plate_number_yellow_xue,
+        #                                    generate_plate_number_yellow_gua,
+        #                                    generate_plate_number_black_gangao,
+        #                                    generate_plate_number_black_shi,
+        #                                    generate_plate_number_black_ling]
+        #     plate_number = random_select(generate_plate_number_funcs)()
 
-        bg_color = random_select(['blue'] + ['yellow'])
 
-        if len(plate_number) == 8:
-            bg_color = random_select(['green_car'] * 10 + ['green_truck'])
-        elif len(set(plate_number) & set(['使', '领', '港', '澳'])) > 0:
-            bg_color = 'black'
-        elif '警' in plate_number or plate_number[0] in letters:
-            bg_color = 'white'
-        elif len(set(plate_number) & set(['学', '挂'])) > 0:
-            bg_color = 'yellow'
+        #bg_color = random_select(['blue'] + ['yellow'])
 
-        is_double = random_select([False] + [True] * 3)
+        # if len(plate_number) == 8:
+        #     bg_color = random_select(['green_car'] * 10 + ['green_truck'])
+        # elif len(set(plate_number) & set(['使', '领', '港', '澳'])) > 0:
+        #     bg_color = 'black'
+        # elif '警' in plate_number or plate_number[0] in letters:
+        #     bg_color = 'white'
+        # elif len(set(plate_number) & set(['学', '挂'])) > 0:
+        #     bg_color = 'yellow'
+        #
+        # is_double = random_select([False] + [True] * 3)
+        #
+        # if '使' in plate_number:
+        #     bg_color = 'black_shi'
+        #
+        # if '挂' in plate_number:
+        #     is_double = True
+        # elif len(set(plate_number) & set(['使', '领', '港', '澳', '学', '警'])) > 0 \
+        #         or len(plate_number) == 8 or bg_color == 'blue':
+        #     is_double = False
+        #
+        # # special
+        # if plate_number[0] in letters and not is_double:
+        #     bg_color = 'white_army'
 
-        if '使' in plate_number:
-            bg_color = 'black_shi'
-
-        if '挂' in plate_number:
-            is_double = True
-        elif len(set(plate_number) & set(['使', '领', '港', '澳', '学', '警'])) > 0 \
-                or len(plate_number) == 8 or bg_color == 'blue':
-            is_double = False
-
-        # special
-        if plate_number[0] in letters and not is_double:
-            bg_color = 'white_army'
+        plate_number = generate_plate_number_blue(length=7)
+        bg_color = 'blue'
+        is_double = False
 
         return plate_number, bg_color, is_double
 
     def generate_plate(self, enhance=False):
         plate_number, bg_color, is_double = self.generate_plate_number()
         height = 220 if is_double else 140
+        print(plate_number, height, bg_color, is_double)
 
-        # print(plate_number, height, bg_color, is_double)
         number_xy = self.get_location_multi(plate_number, height)
         img_plate_model = cv2.imread(os.path.join(self.adr_plate_model, '{}_{}.PNG'.format(bg_color, height)))
         img_plate_model = cv2.resize(img_plate_model, (440 if len(plate_number) == 7 else 480, height))
@@ -235,19 +240,20 @@ class MultiPlateGenerator:
 
 
 if __name__ == '__main__':
-    # 车牌背景颜色
-    bg_color = 'white'
-    # 是否双层车牌
-    is_double = False
-    # 车牌号码
-    plate_number = '豫A9999警'
-
+    # 单张生成测试
+    # # 车牌背景颜色
+    # bg_color = 'white'
+    # # 是否双层车牌
+    # is_double = False
+    # # 车牌号码
+    # plate_number = '豫A9999警'
+    #
     generator = MultiPlateGenerator('plate_model', 'font_model')
-    img = generator.generate_plate_special(plate_number, bg_color, is_double)
+    # img = generator.generate_plate_special(plate_number, bg_color, is_double)
+    # cv2.imwrite('{}.jpg'.format(plate_number), img)
 
-    cv2.imwrite('{}.jpg'.format(plate_number), img)
-
-    # from tqdm import tqdm
-    # for i in tqdm(range(10)):
-    #     img, number_xy, gt_plate_number, bg_color, is_double = generator.generate_plate()
-    #     cv2.imwrite('multi_val/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
+    # 批量生成各种车牌
+    from tqdm import tqdm
+    for i in tqdm(range(10)):
+        img, number_xy, gt_plate_number, bg_color, is_double = generator.generate_plate()
+        cv2.imwrite('multi_val/data/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)

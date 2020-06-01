@@ -6,21 +6,25 @@ import numpy as np
 import cv2, os
 from glob import glob
 
-provinces = ["京", "津", "冀", "晋", "蒙", "辽", "吉", "黑", "沪",
-             "苏", "浙", "皖", "闽", "赣", "鲁", "豫", "鄂", "湘",
-             "粤", "桂", "琼", "渝", "川", "贵", "云", "藏", "陕",
-             "甘", "青", "宁", "新"]
+# provinces = ["京", "津", "冀", "晋", "蒙", "辽", "吉", "黑", "沪",
+#              "苏", "浙", "皖", "闽", "赣", "鲁", "豫", "鄂", "湘",
+#              "粤", "桂", "琼", "渝", "川", "贵", "云", "藏", "陕",
+#              "甘", "青", "宁", "新"]
+
+provinces = ["琼", "贵", "云", "藏", "青", "新"]
 
 # "港", "澳", "使", "领", "学", "警", "挂"]
 digits = ['{}'.format(x + 1) for x in range(9)] + ['0']
+#print('digits:', digits)
 letters = [chr(x + ord('A')) for x in range(26) if not chr(x + ord('A')) in ['I', 'O']]
-# print('letters', digits + letters)
+#print('letters:', letters)
+#print('letters', digits + letters)
 
 
 def random_select(data):
     return data[np.random.randint(len(data))]
 
-
+# 随机生成一个省市，再随机生成6位数字+字母，构成七位
 def generate_plate_number_blue(length=7):
     plate = random_select(provinces)
     for i in range(length - 1):

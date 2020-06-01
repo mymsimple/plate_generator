@@ -1,0 +1,13 @@
+.DS_Store
+.idea/
+.idea/misc.xml
+__pycache__/
+data
+data/
+../data/
+background
+multi_val
+multi_val/
+test
+test/
+utils/data/
