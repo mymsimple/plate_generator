@@ -52,8 +52,30 @@ def extract_txt():
     print("处理完成")
 
 
+def two_txt_merge():
+    lines = []
+    with open("data/enhance.txt","r",encoding='utf-8') as f:
+        for line in f.readlines():
+            line = line.replace("\n","")
+            lines.append(line)
+
+    with open("data/extract.txt","r",encoding='utf-8') as g:
+        for l in g.readlines():
+            l = l.replace("\n","")
+            lines.append(l)
+
+    with open("data/merge.txt","w",encoding='utf-8') as f1:
+        for r in lines:
+            f1.write(str(r) + "\n")
+
+
+
 
 def merge_txt():
+    '''
+    将单个txt合并成一个txt
+    :return:
+    '''
     files = os.listdir("data/enhance_txt/")
     lines = []
     i = 0
@@ -80,4 +102,6 @@ def merge_txt():
 if __name__ == "__main__":
     #merge_txt()
 
-    extract_txt()
+    #extract_txt()
+
+    two_txt_merge()
