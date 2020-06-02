@@ -16,12 +16,10 @@ def extract_txt():
         lines = []
         for line in f.readlines():
             print("line:",line)
+            line = line.replace("\n", "")
             path, label = line.split()
-            #label = label.replace("\n", "")
             chinese = label[0]
-            #print("chinese:", chinese)
 
-            #if chinese != "皖" and chinese != "鲁" and chinese != "苏":
             if chinese == "皖":
                 if i <= 25000:
                     i +=1
