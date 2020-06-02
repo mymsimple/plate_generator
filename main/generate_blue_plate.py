@@ -5,7 +5,6 @@ import numpy as np
 import random
 import math
 from PIL import Image, ImageDraw
-import imutils
 
 '''
     将一张图贴在另一张图上，参考：https://blog.csdn.net/icamera0/article/details/50706615
