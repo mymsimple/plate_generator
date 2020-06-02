@@ -3,20 +3,46 @@
 import os
 
 
-def test():
-    txt_path = "data/test/test_1.txt"
+provinces = ["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪",
+             "桂", "闽", "豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川",
+             "辽", "鄂", "蒙"]
+
+def extract_txt():
+    txt_path = "data/train.txt"
     with open(txt_path, "r", encoding='utf-8') as f:
         i = 0
+        j = 0
+        k = 0
+        lines = []
         for line in f.readlines():
+            print("line:",line)
             path, label = line.split()
             #label = label.replace("\n", "")
             chinese = label[0]
-            print("chinese:", chinese)
+            #print("chinese:", chinese)
 
+            #if chinese != "皖" and chinese != "鲁" and chinese != "苏":
             if chinese == "皖":
-                continue
+                if i <= 25000:
+                    i +=1
+                    lines.append(line)
+            if chinese == "鲁":
+                if j <= 25000:
+                    j +=1
+                    lines.append(line)
+            if chinese == "苏":
+                if k <= 25000:
+                    k +=1
+                    lines.append(line)
             else:
+                lines.append(line)
                 print("")
+
+    with open("data/extract.txt","w",encoding='utf-8') as f1:
+        for l in lines:
+            f1.write(str(l) + "\n")
+    print("处理完成")
+
 
 
 def merge_txt():
@@ -29,13 +55,11 @@ def merge_txt():
             print("已完成：",i)
         if file == ".DS_Store":continue
         else:
-            #print("file:",file)
             path = os.path.join("data/enhance_txt/" + file)
             with open(path, "r", encoding='utf-8') as f:
                 line = f.readline()
                 line = line.replace("\n","")
                 line = "data/ocr/train/" + file[:-4] + ".jpg" + " " + line
-                #print("line:",line)
                 lines.append(line)
 
     with open("data/enhance.txt","w",encoding='utf-8') as f1:
@@ -43,5 +67,9 @@ def merge_txt():
             f1.write(str(l) + "\n")
     print("处理完成")
 
+
+
 if __name__ == "__main__":
-    merge_txt()
+    #merge_txt()
+
+    extract_txt()
