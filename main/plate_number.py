@@ -13,7 +13,7 @@ from glob import glob
 
 #provinces = ["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪","桂","闽"] # 14个汉字需生成20000张
 #provinces = ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"] # 10个汉字需生成750张，增强到15000张
-provinces = ["辽", "鄂", "蒙"] # 3个汉字需生成500张，增强到10000张
+#provinces = ["辽", "鄂", "蒙"] # 3个汉字需生成500张，增强到10000张
 
 # "港", "澳", "使", "领", "学", "警", "挂"]
 digits = ['{}'.format(x + 1) for x in range(9)] + ['0']
@@ -34,9 +34,9 @@ def generate_plate_number_blue(length=7):
 
 def generate_plate_number_blue_copy(length=7):
     # provinces = ["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪","桂","闽"]
-    # provinces = ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"]
-    provinces = ["辽", "鄂", "蒙"]
-    provinces = [val for val in provinces for i in range(500)]
+    provinces = ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"]
+    #provinces = ["辽", "鄂", "蒙"]
+    provinces = [val for val in provinces for i in range(750)]
     plates = []
     for plate in provinces:
         for i in range(length - 1):
