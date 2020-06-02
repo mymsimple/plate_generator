@@ -90,29 +90,19 @@ def show(img, title='无标题'):
 def rotate_bound(plate, background_image, possible):
 
     r = random.sample(range(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT), 2)
-    print("r:",r)
-    #plate.show()
-    print("---", plate.size)
-    print("---",background_image.size)
+
     if not _random_accept(possible):
         background_image.paste(plate, (r[0], r[1]))
     else:
         plate_con = plate.convert("RGBA")
-        print("1")
         p = Image.new('RGBA', (500, 200))
-        print("--------")
-        #p.show()
         p.paste(plate_con, (10, 10))
-        #p.show()
-        print("==========")
         angle = random.randrange(-ROTATE_ANGLE, ROTATE_ANGLE)
-        print("angle:",angle)
         plate_r = p.rotate(angle)
-        #plate_r.show()
 
         r, g, b, a = plate_r.split()
         background_image.paste(plate_r, (4, 0), mask=a)
-        #background_image.show()
+
     return background_image
 
 
@@ -121,8 +111,6 @@ def image_resize(image, possible):
 
     w, h = image.size
     image = image.resize((int(w / 2), int(h / 2)), Image.ANTIALIAS)
-    print(image.size)
-    #image.show()
 
     return image
 
@@ -162,9 +150,7 @@ def main(bg_path, plate_path, data_txt_path):
     print(files)
     i = 0
     for file in os.listdir(data_txt_path):
-        print("file:",file)
         txt_path = os.path.join(data_txt_path + file)
-        print("txt_path:",txt_path)
         with open(txt_path, "r", encoding='utf-8') as f:
             label = f.readline()
             image = Image.open(os.path.join(plate_path + file[:-4] + '.jpg'))
@@ -175,19 +161,19 @@ def main(bg_path, plate_path, data_txt_path):
             file = np.random.choice(files)
             print("file:",file)
             background_image = Image.open(os.path.join(bg_path + file))
-            #background_image.show()
+
             # 旋转
             background_image = rotate_bound(image, background_image, POSSIBILITY_ROTATE)
-            #background_image.show()
+
             # 压缩车牌
             background_image = image_resize(background_image, POSSIBILITY_RESIZE)
 
 
             i += 1
-            path = os.path.join("multi_val/plate/" + str(i) + ".jpg")
+            path = os.path.join("data/plate/" + str(i) + ".jpg")
             background_image.save(path)
 
-            plate_txt = os.path.join("multi_val/plate_txt/" + str(i) + ".txt")
+            plate_txt = os.path.join("data/plate_txt/" + str(i) + ".txt")
             with open(plate_txt, "w", encoding='utf-8') as f1:
                 f1.write(str(label))
 
@@ -243,9 +229,9 @@ if __name__ == "__main__":
     #draw_img(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT)
 
     # 生成车牌
-    bg_path = "multi_val/bg/"
-    plate_path = "multi_val/data/"
-    data_txt_path = "multi_val/data_txt/"
+    bg_path = "data/bg/"
+    plate_path = "data/data/"
+    data_txt_path = "data/data_txt/"
 
     main(bg_path, plate_path, data_txt_path)
 
