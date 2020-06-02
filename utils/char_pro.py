@@ -16,8 +16,8 @@ def extract_txt():
         lines = []
         m = 0
         for line in f.readlines():
+            m += 1
             if m % 1000 == 0:
-                m +=1
                 print("已完成：", m)
 
                 line = line.replace("\n", "")
