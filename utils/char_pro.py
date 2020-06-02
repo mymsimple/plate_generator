@@ -30,20 +30,21 @@ def extract_txt():
                     i +=1
                     lines.append(line)
 
-            if chinese == "鲁":
+            elif chinese == "鲁":
                 if j > 25000:continue
                 else:
                     j +=1
                     lines.append(line)
 
-            if chinese == "苏":
+            elif chinese == "苏":
                 if k > 25000:continue
                 else:
                     k +=1
                     lines.append(line)
 
-            lines.append(line)
-                
+            else:
+                lines.append(line)
+
 
     with open("data/extract.txt","w",encoding='utf-8') as f1:
         for l in lines:
