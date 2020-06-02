@@ -20,31 +20,30 @@ def extract_txt():
             if m % 1000 == 0:
                 print("已完成：", m)
 
-                line = line.replace("\n", "")
-                path, label = line.split()
-                chinese = label[0]
+            line = line.replace("\n", "")
+            path, label = line.split()
+            chinese = label[0]
 
-                if chinese == "皖":
-                    if i <= 25000:
-                        i +=1
-                        lines.append(line)
-                    else:
-                        continue
-                if chinese == "鲁":
-                    if j <= 25000:
-                        j +=1
-                        lines.append(line)
-                    else:
-                        continue
-                if chinese == "苏":
-                    if k <= 25000:
-                        k +=1
-                        lines.append(line)
-                    else:
-                        continue
+            if chinese == "皖":
+                if i > 25000:continue
                 else:
+                    i +=1
                     lines.append(line)
-                    print("")
+
+            if chinese == "鲁":
+                if j > 25000:continue
+                else:
+                    j +=1
+                    lines.append(line)
+
+            if chinese == "苏":
+                if k > 25000:continue
+                else:
+                    k +=1
+                    lines.append(line)
+
+            lines.append(line)
+                
 
     with open("data/extract.txt","w",encoding='utf-8') as f1:
         for l in lines:
