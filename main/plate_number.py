@@ -36,6 +36,7 @@ def generate_plate_number_blue_copy(length=7):
     # provinces = ["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪","桂","闽"]
     provinces = ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"]
     #provinces = ["辽", "鄂", "蒙"]
+
     provinces = [val for val in provinces for i in range(750)]
     plates = []
     for plate in provinces:
