@@ -24,14 +24,20 @@ def extract_txt():
                 if i <= 25000:
                     i +=1
                     lines.append(line)
+                else:
+                    continue
             if chinese == "鲁":
                 if j <= 25000:
                     j +=1
                     lines.append(line)
+                else:
+                    continue
             if chinese == "苏":
                 if k <= 25000:
                     k +=1
                     lines.append(line)
+                else:
+                    continue
             else:
                 lines.append(line)
                 print("")
