@@ -273,10 +273,10 @@ def do_folder(p_no,folder,image_list):
 
 
 
-good_images_path = "multi_val/plate/"
-good_txt_path = "multi_val/plate_txt/"
-enhance_txt_path = "multi_val/enhance_txt/"
-enhance_images_path = "multi_val/enhance/"
+good_images_path = "data/plate/"
+good_txt_path = "data/plate_txt/"
+enhance_txt_path = "data/enhance_txt/"
+enhance_images_path = "data/enhance/"
 
 
 if __name__ == "__main__":
