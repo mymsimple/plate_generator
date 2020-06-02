@@ -266,8 +266,8 @@ if __name__ == '__main__':
         img_all, number_xy, gt_plate_numbers, bg_color, is_double = generator.generate_plate()
         for j,img in enumerate(img_all):
             gt_plate_number = gt_plate_numbers[j]
-            cv2.imwrite('multi_val/data/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
+            cv2.imwrite('data/data/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
 
             line = gt_plate_number + "_" + bg_color + "_" + str(is_double) + ".jpg"
-            with open("multi_val/data_txt/{}_{}_{}.txt".format(gt_plate_number, bg_color, is_double), "w", encoding='utf-8') as f:
+            with open("data/data_txt/{}_{}_{}.txt".format(gt_plate_number, bg_color, is_double), "w", encoding='utf-8') as f:
                 f.write(str(gt_plate_number) + "\n")
