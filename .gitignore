@@ -5,6 +5,7 @@ __pycache__/
 data
 data/
 ../data/
+data_old/
 background
 multi_val
 multi_val/
