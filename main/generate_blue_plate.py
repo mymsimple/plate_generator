@@ -23,7 +23,7 @@ INTERFER_LINE_WIGHT = 2
 
 INTERFER_POINT_NUM = 10
 
-MAX_WIDTH_HEIGHT = 20
+MAX_WIDTH_HEIGHT = 15
 MIN_WIDTH_HEIGHT = 0
 
 ROTATE_ANGLE = 5
@@ -90,64 +90,70 @@ def show(img, title='无标题'):
 def rotate_bound(plate, background_image, possible):
 
     r = random.sample(range(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT), 2)
-    if not _random_accept(possible): return background_image.paste(plate, (r[0], r[1]))
+    print("r:",r)
+    #plate.show()
+    print("---", plate.size)
+    print("---",background_image.size)
+    if not _random_accept(possible):
+        background_image.paste(plate, (r[0], r[1]))
+    else:
+        plate_con = plate.convert("RGBA")
+        print("1")
+        p = Image.new('RGBA', (500, 200))
+        print("--------")
+        #p.show()
+        p.paste(plate_con, (10, 10))
+        #p.show()
+        print("==========")
+        angle = random.randrange(-ROTATE_ANGLE, ROTATE_ANGLE)
+        print("angle:",angle)
+        plate_r = p.rotate(angle)
+        #plate_r.show()
 
-    plate_con = plate.convert("RGBA")
-    p = Image.new('RGBA', (500, 200))
-    p.paste(plate_con, (10, 10))
-    angle = random.randrange(-ROTATE_ANGLE, ROTATE_ANGLE)
-    plate_r = p.rotate(angle)
-
-    r, g, b, a = plate_r.split()
-    background_image.paste(plate_r, (4, 0), mask=a)
-
+        r, g, b, a = plate_r.split()
+        background_image.paste(plate_r, (4, 0), mask=a)
+        #background_image.show()
     return background_image
 
 
 def image_resize(image, possible):
     if not _random_accept(possible): return image
 
-    #image = cv2.imread("multi_val/plate/1.jpg")
-    # print(image.shape)
-    # h, w, _ = image.shape
-    # r_img = cv2.resize(image, (int(w/2),int(h/2)), interpolation=cv2.INTER_AREA)
-    # show(r_img)
-
     w, h = image.size
     image = image.resize((int(w / 2), int(h / 2)), Image.ANTIALIAS)
-    #print(image.size)
+    print(image.size)
     #image.show()
 
     return image
 
 
 
-def draw_img(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT):
-    image = Image.open("multi_val/data/云QF5H7P_blue_False.jpg")
-    #image.show()
-
-    # 在整张图上产生干扰点和线
-    randome_intefer_line(image, POSSIBILITY_INTEFER, INTERFER_LINE_NUM, INTERFER_LINE_WIGHT)
-    #image.show()
-
-    background_image = Image.open("data/background/1.jpg")
-
-    #plate = cv2.imread("multi_val/data/云QF5H7P_blue_False.jpg")
-    #rotated = rotate(plate, 20, scale=1.0)
-
-    # rotated = image.rotate(20)
-    # rotated = rotated.convert("RGBA")
-    # rotated.show()
-
-    r = random.sample(range(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT), 2)
-    background_image.paste(image, (r[0], r[1]))
-    background_image.show()
-
-
-
-    # words_image = Image.new('RGB', (200, 100), (0,255,0))
-    # draw = ImageDraw.Draw(words_image)
-    # words_image.show()
+# def draw_img(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT):
+#     image = Image.open("multi_val/data/云QF5H7P_blue_False.jpg")
+#     #image.show()
+#
+#     # 在整张图上产生干扰点和线
+#     randome_intefer_line(image, POSSIBILITY_INTEFER, INTERFER_LINE_NUM, INTERFER_LINE_WIGHT)
+#     #image.show()
+#
+#     background_image = Image.open("data/background/1.jpg")
+#
+#     #plate = cv2.imread("multi_val/data/云QF5H7P_blue_False.jpg")
+#     #rotated = rotate(plate, 20, scale=1.0)
+#
+#     # rotated = image.rotate(20)
+#     # rotated = rotated.convert("RGBA")
+#     # rotated.show()
+#
+#     r = random.sample(range(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT), 2)
+#     background_image.paste(image, (r[0], r[1]))
+#     background_image.show()
+#
+#
+#
+#     # words_image = Image.new('RGB', (200, 100), (0,255,0))
+#     # draw = ImageDraw.Draw(words_image)
+#     # words_image.show()
 
 
 
@@ -156,8 +162,9 @@ def main(bg_path, plate_path, data_txt_path):
     print(files)
     i = 0
     for file in os.listdir(data_txt_path):
-        #print("file:",file)
+        print("file:",file)
         txt_path = os.path.join(data_txt_path + file)
+        print("txt_path:",txt_path)
         with open(txt_path, "r", encoding='utf-8') as f:
             label = f.readline()
             image = Image.open(os.path.join(plate_path + file[:-4] + '.jpg'))
@@ -166,12 +173,12 @@ def main(bg_path, plate_path, data_txt_path):
 
             # 随机抽取汽车背景图片
             file = np.random.choice(files)
+            print("file:",file)
             background_image = Image.open(os.path.join(bg_path + file))
-
+            #background_image.show()
             # 旋转
-            #background_image = Image.open(os.path.join(bg_path + file))
             background_image = rotate_bound(image, background_image, POSSIBILITY_ROTATE)
-
+            #background_image.show()
             # 压缩车牌
             background_image = image_resize(background_image, POSSIBILITY_RESIZE)
 
@@ -227,15 +234,6 @@ def test():
     #background_image.show()
     background_image.save("multi_val/newImg.png", "PNG")
 
-
-    # rotated = Image.open("data/test.jpg")
-    # print(rotated.mode)
-    # #rotated.show()
-    # rotated = rotated.convert("RGBA")
-    # rotated.show()
-    # background_image = Image.open(os.path.join(path + file))
-    # background_image.paste(rotated,(60,60))
-    # background_image.show()
 
 
 

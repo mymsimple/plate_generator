@@ -5,7 +5,7 @@ from glob import glob
 
 from plate_number import random_select, generate_plate_number_white, generate_plate_number_yellow_xue
 from plate_number import generate_plate_number_black_gangao, generate_plate_number_black_shi, generate_plate_number_black_ling
-from plate_number import generate_plate_number_blue, generate_plate_number_yellow_gua
+from plate_number import generate_plate_number_blue_copy, generate_plate_number_yellow_gua
 from plate_number import letters, digits
 
 
@@ -95,96 +95,103 @@ class MultiPlateGenerator:
             split_id = 2
         return self.location_xys['{}_{}_{}'.format(length, split_id, height)]
 
-    def generate_plate_number(self):
-        #rate = np.random.random(1)
-        #if rate > 0.4:
-            #plate_number = generate_plate_number_blue(length=random_select([7, 8]))
-        # else:
-        #     generate_plate_number_funcs = [generate_plate_number_white,
-        #                                    generate_plate_number_yellow_xue,
-        #                                    generate_plate_number_yellow_gua,
-        #                                    generate_plate_number_black_gangao,
-        #                                    generate_plate_number_black_shi,
-        #                                    generate_plate_number_black_ling]
-        #     plate_number = random_select(generate_plate_number_funcs)()
-
-
-        #bg_color = random_select(['blue'] + ['yellow'])
-
-        # if len(plate_number) == 8:
-        #     bg_color = random_select(['green_car'] * 10 + ['green_truck'])
-        # elif len(set(plate_number) & set(['使', '领', '港', '澳'])) > 0:
-        #     bg_color = 'black'
-        # elif '警' in plate_number or plate_number[0] in letters:
-        #     bg_color = 'white'
-        # elif len(set(plate_number) & set(['学', '挂'])) > 0:
-        #     bg_color = 'yellow'
-        #
-        # is_double = random_select([False] + [True] * 3)
-        #
-        # if '使' in plate_number:
-        #     bg_color = 'black_shi'
-        #
-        # if '挂' in plate_number:
-        #     is_double = True
-        # elif len(set(plate_number) & set(['使', '领', '港', '澳', '学', '警'])) > 0 \
-        #         or len(plate_number) == 8 or bg_color == 'blue':
-        #     is_double = False
-        #
-        # # special
-        # if plate_number[0] in letters and not is_double:
-        #     bg_color = 'white_army'
-
-        plate_number = generate_plate_number_blue(length=7)
-        bg_color = 'blue'
-        is_double = False
-
-        return plate_number, bg_color, is_double
+    # def generate_plate_number(self):
+    #     #rate = np.random.random(1)
+    #     #if rate > 0.4:
+    #         #plate_number = generate_plate_number_blue(length=random_select([7, 8]))
+    #     # else:
+    #     #     generate_plate_number_funcs = [generate_plate_number_white,
+    #     #                                    generate_plate_number_yellow_xue,
+    #     #                                    generate_plate_number_yellow_gua,
+    #     #                                    generate_plate_number_black_gangao,
+    #     #                                    generate_plate_number_black_shi,
+    #     #                                    generate_plate_number_black_ling]
+    #     #     plate_number = random_select(generate_plate_number_funcs)()
+    #
+    #
+    #     #bg_color = random_select(['blue'] + ['yellow'])
+    #
+    #     # if len(plate_number) == 8:
+    #     #     bg_color = random_select(['green_car'] * 10 + ['green_truck'])
+    #     # elif len(set(plate_number) & set(['使', '领', '港', '澳'])) > 0:
+    #     #     bg_color = 'black'
+    #     # elif '警' in plate_number or plate_number[0] in letters:
+    #     #     bg_color = 'white'
+    #     # elif len(set(plate_number) & set(['学', '挂'])) > 0:
+    #     #     bg_color = 'yellow'
+    #     #
+    #     # is_double = random_select([False] + [True] * 3)
+    #     #
+    #     # if '使' in plate_number:
+    #     #     bg_color = 'black_shi'
+    #     #
+    #     # if '挂' in plate_number:
+    #     #     is_double = True
+    #     # elif len(set(plate_number) & set(['使', '领', '港', '澳', '学', '警'])) > 0 \
+    #     #         or len(plate_number) == 8 or bg_color == 'blue':
+    #     #     is_double = False
+    #     #
+    #     # # special
+    #     # if plate_number[0] in letters and not is_double:
+    #     #     bg_color = 'white_army'
+    #
+    #     plate_number = generate_plate_number_blue(length=7)
+    #     bg_color = 'blue'
+    #     is_double = False
+    #
+    #     return plate_number, bg_color, is_double
 
     def generate_plate(self, enhance=False):
-        plate_number, bg_color, is_double = self.generate_plate_number()
-        height = 220 if is_double else 140
-        print(plate_number, height, bg_color, is_double)
+        #plate_numbers, bg_color, is_double = self.generate_plate_number()
 
-        number_xy = self.get_location_multi(plate_number, height)
-        img_plate_model = cv2.imread(os.path.join(self.adr_plate_model, '{}_{}.PNG'.format(bg_color, height)))
-        img_plate_model = cv2.resize(img_plate_model, (440 if len(plate_number) == 7 else 480, height))
+        plate_numbers = generate_plate_number_blue_copy(length=7)
 
-        for i in range(len(plate_number)):
-            if len(plate_number) == 8:
-                font_img = self.font_imgs['green_{}'.format(plate_number[i])]
-            else:
-                if '{}_{}'.format(height, plate_number[i]) in self.font_imgs:
-                    font_img = self.font_imgs['{}_{}'.format(height, plate_number[i])]
+        img_plate_model_all = []
+        for plate_number in plate_numbers:
+            bg_color = 'blue'
+            is_double = False
+            height = 220 if is_double else 140
+
+            number_xy = self.get_location_multi(plate_number, height)
+            img_plate_model = cv2.imread(os.path.join(self.adr_plate_model, '{}_{}.PNG'.format(bg_color, height)))
+            img_plate_model = cv2.resize(img_plate_model, (440 if len(plate_number) == 7 else 480, height))
+
+            for i in range(len(plate_number)):
+                if len(plate_number) == 8:
+                    font_img = self.font_imgs['green_{}'.format(plate_number[i])]
                 else:
-                    if i < 2:
-                        font_img = self.font_imgs['220_up_{}'.format(plate_number[i])]
+                    if '{}_{}'.format(height, plate_number[i]) in self.font_imgs:
+                        font_img = self.font_imgs['{}_{}'.format(height, plate_number[i])]
                     else:
-                        font_img = self.font_imgs['220_down_{}'.format(plate_number[i])]
+                        if i < 2:
+                            font_img = self.font_imgs['220_up_{}'.format(plate_number[i])]
+                        else:
+                            font_img = self.font_imgs['220_down_{}'.format(plate_number[i])]
 
-            if (i == 0 and plate_number[0] in letters) or plate_number[i] in ['警', '使', '领']:
-                is_red = True
-            elif i == 1 and plate_number[0] in letters and np.random.random(1) > 0.5:
-                # second letter of army plate
-                is_red = True
-            else:
-                is_red = False
-
-            if enhance:
-                k = np.random.randint(1, 6)
-                kernel = np.ones((k, k), np.uint8)
-                if np.random.random(1) > 0.5:
-                    font_img = np.copy(cv2.erode(font_img, kernel, iterations=1))
+                if (i == 0 and plate_number[0] in letters) or plate_number[i] in ['警', '使', '领']:
+                    is_red = True
+                elif i == 1 and plate_number[0] in letters and np.random.random(1) > 0.5:
+                    # second letter of army plate
+                    is_red = True
                 else:
-                    font_img = np.copy(cv2.dilate(font_img, kernel, iterations=1))
+                    is_red = False
 
-            img_plate_model = copy_to_image_multi(img_plate_model, font_img,
-                                                  number_xy[i, :], bg_color, is_red)
+                if enhance:
+                    k = np.random.randint(1, 6)
+                    kernel = np.ones((k, k), np.uint8)
+                    if np.random.random(1) > 0.5:
+                        font_img = np.copy(cv2.erode(font_img, kernel, iterations=1))
+                    else:
+                        font_img = np.copy(cv2.dilate(font_img, kernel, iterations=1))
 
-        # is_double = 'double' if is_double else 'single'
-        img_plate_model = cv2.blur(img_plate_model, (3, 3))
+                img_plate_model = copy_to_image_multi(img_plate_model, font_img,
+                                                      number_xy[i, :], bg_color, is_red)
 
-        return img_plate_model, number_xy, plate_number, bg_color, is_double
+            # is_double = 'double' if is_double else 'single'
+            img_plate_model = cv2.blur(img_plate_model, (3, 3))
+            img_plate_model_all.append(img_plate_model)
+
+        return img_plate_model_all, number_xy, plate_numbers, bg_color, is_double
 
     def generate_plate_special(self, plate_number, bg_color, is_double, enhance=False):
         """
@@ -254,6 +261,13 @@ if __name__ == '__main__':
 
     # 批量生成各种车牌
     from tqdm import tqdm
-    for i in tqdm(range(10)):
-        img, number_xy, gt_plate_number, bg_color, is_double = generator.generate_plate()
-        cv2.imwrite('multi_val/data/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
+    for i in tqdm(range(1)):
+
+        img_all, number_xy, gt_plate_numbers, bg_color, is_double = generator.generate_plate()
+        for j,img in enumerate(img_all):
+            gt_plate_number = gt_plate_numbers[j]
+            cv2.imwrite('multi_val/data/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
+
+            line = gt_plate_number + "_" + bg_color + "_" + str(is_double) + ".jpg"
+            with open("multi_val/data_txt/{}_{}_{}.txt".format(gt_plate_number, bg_color, is_double), "w", encoding='utf-8') as f:
+                f.write(str(gt_plate_number) + "\n")
