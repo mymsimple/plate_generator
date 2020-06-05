@@ -214,9 +214,10 @@ if __name__ == '__main__':
         path = os.path.join("data/problem_images/" + file)
         print("path:",path)
         img = cv2.imread(path)
-        img_base64 = cv2_to_base64(img)
-        data = detect(img_base64)
-        main(img_base64, data, file)
+        if img is not None:
+            img_base64 = cv2_to_base64(img)
+            data = detect(img_base64)
+            main(img_base64, data, file)
 
 
 # 测试
