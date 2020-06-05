@@ -109,8 +109,8 @@ def order_points(image,pts):
 
     #print("rect[0]:",rect[0])
     #print("rect[2]:", rect[2])
-    cv2.rectangle(image, (rect[0][0],rect[0][1]), (rect[2][0],rect[2][1]), (0, 0, 255), 3)
-    cv2.imwrite(os.path.join('data/debug.jpg'), image)
+    # cv2.rectangle(image, (rect[0][0],rect[0][1]), (rect[2][0],rect[2][1]), (0, 0, 255), 3)
+    # cv2.imwrite(os.path.join('data/debug.jpg'), image)
 
     # 分别计算左上角和右下角的离散差值
     diff = np.diff(pts, axis=1)
