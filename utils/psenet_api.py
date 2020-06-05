@@ -73,9 +73,7 @@ def detect(img_base64):
     post_data = {"img": img_base64,
                  "sid": "iamsid",
                  "do_verbose": False,
-                 'detect_model': 'psenet',
-                 'output_type':'rect',
-                 'do_preprocess': False
+                 'detect_model': 'plate'
     }
     headers = {'Content-Type': 'application/json'}
     response = requests.post(url, json=post_data, headers=headers)
@@ -111,8 +109,8 @@ def order_points(image,pts):
 
     #print("rect[0]:",rect[0])
     #print("rect[2]:", rect[2])
-    # cv2.rectangle(image, (rect[0][0],rect[0][1]), (rect[2][0],rect[2][1]), (0, 0, 255), 3)
-    # cv2.imwrite(os.path.join('data/debug.jpg'), image)
+    cv2.rectangle(image, (rect[0][0],rect[0][1]), (rect[2][0],rect[2][1]), (0, 0, 255), 3)
+    cv2.imwrite(os.path.join('data/debug.jpg'), image)
 
     # 分别计算左上角和右下角的离散差值
     diff = np.diff(pts, axis=1)
@@ -199,6 +197,7 @@ def main(img,data,file):
     img_path = os.path.join("data/psenet/" + file)
     cv2.imwrite(img_path, max_plate_image)
 
+    #cv2.imwrite("data/psenet.jpg", max_plate_image)
     return max_area, max_plate_image, max_bbox
 
         # i = 0
@@ -220,9 +219,10 @@ if __name__ == '__main__':
             main(img_base64, data, file)
 
 
-# 测试
+# # 测试
 # if __name__ == '__main__':
-#     img = cv2.imread("data_old/bj/black.jpg")
+#     #img = cv2.imread("data_old/bj/black.jpg")
+#     img = cv2.imread("data_old/D_32234567_15N5007P.png")
 #     img_base64 = cv2_to_base64(img)
 #     data = detect(img_base64)
 #     main(img_base64, data)
