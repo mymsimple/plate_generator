@@ -300,6 +300,9 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
     logger.info("程序处理结束，全部增强完毕！")
+
+
+
 # 测试
     # label = [(432, 1442), (770, 1514), (760, 1670), (424, 1594), '湘B3CY92']
     # label = ast.literal_eval(label)

@@ -146,7 +146,7 @@ def image_resize(image, possible):
 
 def main(bg_path, plate_path, data_txt_path):
     files = os.listdir(bg_path)
-    print(files)
+    #print(files)
     i = 0
     for file in os.listdir(data_txt_path):
         txt_path = os.path.join(data_txt_path + file)
@@ -158,7 +158,7 @@ def main(bg_path, plate_path, data_txt_path):
 
             # 随机抽取汽车背景图片
             file = np.random.choice(files)
-            print("file:",file)
+            #print("file:",file)
             background_image = Image.open(os.path.join(bg_path + file))
 
             # 旋转
@@ -233,4 +233,5 @@ if __name__ == "__main__":
     data_txt_path = "data/data_txt/"
 
     main(bg_path, plate_path, data_txt_path)
+    print("处理完成")
 
