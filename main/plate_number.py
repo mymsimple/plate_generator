@@ -7,16 +7,22 @@ import cv2, os
 from glob import glob
 
 # 车牌中包含的所有省份汉字
-# provinces = ["京", "津", "冀", "晋", "蒙", "辽", "吉", "黑", "沪",
-#              "苏", "浙", "皖", "闽", "赣", "鲁", "豫", "鄂", "湘",
-#              "粤", "桂", "琼", "渝", "川", "贵", "云", "藏", "陕",
-#              "甘", "青", "宁", "新"]
+provinces = ["京", "津", "冀", "晋", "蒙", "辽", "吉", "黑", "沪",
+             "苏", "浙", "皖", "闽", "赣", "鲁", "豫", "鄂", "湘",
+             "粤", "桂", "琼", "渝", "川", "贵", "云", "藏", "陕",
+             "甘", "青", "宁", "新", "港", "澳", "使", "领", "学", "警", "挂"]
 
-provinces = ["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪","桂","闽"] # 14个汉字需生成20000张
-#provinces = ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"] # 10个汉字需生成750张，增强到15000张
-#provinces = ["辽", "鄂", "蒙"] # 3个汉字需生成500张，增强到10000张
+'''
+    根据原来样本数量统计生成不同数量的样本，保证每个省份汉字都在2w-2.5w之间
+    ["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪","桂","闽"] # 14个汉字需生成1000张，增强到20000张
+    ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"] # 10个汉字需生成750张，增强到15000张
+    ["辽", "鄂", "蒙"] # 3个汉字需生成500张，增强到10000张
+'''
+provinces_list = [["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪", "桂", "闽"],
+                  ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"],
+                  ["辽", "鄂", "蒙"]]
 
-# "港", "澳", "使", "领", "学", "警", "挂"]
+
 digits = ['{}'.format(x + 1) for x in range(9)] + ['0']
 letters = [chr(x + ord('A')) for x in range(26) if not chr(x + ord('A')) in ['I', 'O']]
 #print('letters', digits + letters)
@@ -24,6 +30,7 @@ letters = [chr(x + ord('A')) for x in range(26) if not chr(x + ord('A')) in ['I'
 
 def random_select(data):
     return data[np.random.randint(len(data))]
+
 
 #随机生成一个省市，再随机生成6位数字+字母，构成七位
 def generate_plate_number_blue(length=7):
@@ -33,18 +40,21 @@ def generate_plate_number_blue(length=7):
     return plate
 
 
+# 循环遍历一个省市，再随机生成6位数字+字母，构成七位
 def generate_plate_number_blue_copy(length=7):
-    provinces = ["琼", "贵", "云", "藏", "青", "新", "晋", "甘", "赣", "津", "宁", "沪","桂","闽"]
-    #provinces = ["豫", "黑", "湘", "京", "陕", "浙", "吉", "粤", "渝", "川"]
-    #provinces = ["辽", "鄂", "蒙"]
-
-    provinces = [val for val in provinces for i in range(1000)]
     plates = []
-    for plate in provinces:
-        for i in range(length - 1):
-            plate += random_select(digits + letters)
-        plates.append(plate)
+    for provinces in provinces_list:
+        if len(provinces) == 14:
+            provinces = [val for val in provinces for i in range(1)]
+        if len(provinces) == 10:
+            provinces = [val for val in provinces for i in range(1)]
+        if len(provinces) == 3:
+            provinces = [val for val in provinces for i in range(1)]
 
+        for plate in provinces:
+            for i in range(length - 1):
+                plate += random_select(digits + letters)
+            plates.append(plate)
     return plates
 
 

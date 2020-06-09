@@ -11,8 +11,6 @@ import logging
 logging.basicConfig(level = logging.DEBUG,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# import log_utils
-# logger = log_utils.init_logger()
 
 MIN_ROTATE_ANGLE = 1  # 旋转的最小角度
 MAX_ROTATE_ANGLE = 20 # 旋转的最大角度
@@ -179,15 +177,12 @@ def rotate(image,scale=1.0):
 # 先做切边，上下左右切边，返回的坐标也要跟着修改，切下边和右边，坐标不变
 def cut_edge(image,label,file_name):
     e = random.randint(MIN_EDGE_HEIGHT, MAX_EDGE_HEIGHT)  # 随机产生要切边的大小
-    #print("切边大小:",e)
-    #print("车牌号:",label)
+
     # 原图的尺寸
     h,w,_ = image.shape
-    #print("原图尺寸：",image.shape)
 
     # 切上边
     img_up = image[e:h, 0:w]
-    #print("---------",file_name)
     cv2.imwrite(os.path.join(enhance_images_path + file_name[:-4] + '_up' + '.jpg'), img_up)
     with open(enhance_txt_path + file_name[:-4] + '_up' + '.txt', "w", encoding='utf-8') as f:
         f.write(str(label))
@@ -256,9 +251,7 @@ def enhance_all_with_save(img,f_name,label):
 def do_folder(p_no,folder,image_list):
     for file_name in image_list:
         logger.info("线程：%r,读取图片：%s",p_no,file_name)
-        # print('线程：',p_no,'读取的图片名称:', file_name)
         f_name = os.path.join(folder,file_name)
-        #print('f_name:',f_name)
         img = cv2.imread(f_name)
         logger.info("处理图片名称：%s", f_name)
 
@@ -281,7 +274,7 @@ enhance_images_path = "data/enhance/"
 
 if __name__ == "__main__":
     # 线程数
-    worker = 2
+    worker = 20
     if not (os.path.exists(enhance_images_path)):
         os.makedirs(enhance_images_path)
     if not (os.path.exists(enhance_txt_path)):

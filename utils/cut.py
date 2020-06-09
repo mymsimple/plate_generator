@@ -57,48 +57,46 @@ def get_patches(img):
             grayCrop = img[hStart:(hStart + dim_h), wStart:(wStart + dim_w)]
             candidate_patches.append(grayCrop)
 
-    patch_idxes = np.arange(0, len(candidate_patches))
+    #patch_idxes = np.arange(0, len(candidate_patches))
     #print("patch_idxes:",patch_idxes)
 
     return candidate_patches
 
 
-def single_test():
-    img_path = "data/bj/blue.jpg"
-    path, name = os.path.split(img_path)
-    file, ext = os.path.splitext(name)
-    print("file:", file)
-    print("ext:", ext)
-    img = cv2.imread(img_path)
-    candidate_patches = get_patches(img)
-    print(type(candidate_patches))
-    print(candidate_patches[0:2])
+def main(dir):
+    patches = []
+    for file in os.listdir(dir):
+        path = dir + file
+        img = cv2.imread(path)
+        candidate_patches = get_patches(img)
+        patches = patches + candidate_patches
 
-    i = 0
-    for p in candidate_patches:
-        i += 1
-        cv2.imwrite(os.path.join("data/patches/" + file + "_" + str(i) + ".jpg"), p)
-
-
+    return patches
 
 
 
 if __name__ == "__main__":
-    #single_test()
+    bj_dir = "data/bj/"
+    patches_path = "multi_val/patches/"
 
-    patches = []
-    dir = "data/bj/"
-    for file in os.listdir(dir):
-        #print("file:",file)
-        path = dir + file
-        print("path:",path)
-        img = cv2.imread(path)
-        candidate_patches = get_patches(img)
-        # print(type(candidate_patches))
-        # print(candidate_patches[0:2])
-        patches = patches + candidate_patches
-
+    patches = main(bj_dir)
     i = 0
     for p in patches:
         i += 1
-        cv2.imwrite(os.path.join("multi_val/patches/" + str(i) + ".jpg"), p)
+        path = os.path.join(patches_path + str(i) + ".jpg")
+        cv2.imwrite(path, p)
+
+
+
+# # 测试
+# if __name__ == "__main__":
+#     img_path = "data/bj/blue.jpg"
+#     path, name = os.path.split(img_path)
+#     file, ext = os.path.splitext(name)
+#     img = cv2.imread(img_path)
+#     candidate_patches = get_patches(img)
+#
+#     i = 0
+#     for p in candidate_patches:
+#         i += 1
+#         cv2.imwrite(os.path.join("data/patches/" + file + "_" + str(i) + ".jpg"), p)

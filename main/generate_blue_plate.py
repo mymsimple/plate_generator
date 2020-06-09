@@ -7,32 +7,26 @@ import math
 from PIL import Image, ImageDraw
 
 '''
-    将一张图贴在另一张图上，参考：https://blog.csdn.net/icamera0/article/details/50706615
+    随机抽取一张汽车背景图片，随机选择一张生成的车牌，将生成的车牌贴在汽车背景图片上，增加干扰线、干扰点、随机旋转和切边等，增加生成车牌的真实性
 '''
 
 # 颜色的算法是，产生一个基准，然后RGB上下浮动FONT_COLOR_NOISE
 MAX_FONT_COLOR = 100    # 最大的可能颜色
 FONT_COLOR_NOISE = 10   # 最大的可能颜色
-
 POSSIBILITY_RESIZE = 0.5    # 图像压缩的比例
 POSSIBILITY_ROTATE = 0.7    # 图像旋转的比例
-POSSIBILITY_INTEFER = 0.8   # 需要被干扰的图片，包括干扰线和点
-INTERFER_LINE_NUM = 10
+POSSIBILITY_INTEFER = 0.8   # 需要被干扰的图片比例，包括干扰线和点
+INTERFER_LINE_NUM = 10      # 最多干扰线
 INTERFER_LINE_WIGHT = 2
-
-INTERFER_POINT_NUM = 10
-
-MAX_WIDTH_HEIGHT = 15
-MIN_WIDTH_HEIGHT = 0
-
-ROTATE_ANGLE = 5
-
-
+INTERFER_POINT_NUM = 10     # 最多干扰点
+MAX_WIDTH_HEIGHT = 15    # 最大切边
+MIN_WIDTH_HEIGHT = 0     # 最小切边
+ROTATE_ANGLE = 5      # 最大旋转角度
 
 
 # 随机接受概率
 def _random_accept(accept_possibility):
-    return np.random.choice([True,False], p = [accept_possibility,1 - accept_possibility])
+    return np.random.choice([True,False], p=[accept_possibility,1 - accept_possibility])
 
 def _get_random_point(x_scope,y_scope):
     x1 = random.randint(0,x_scope)
@@ -87,7 +81,6 @@ def show(img, title='无标题'):
 
 
 def rotate_bound(plate, background_image, possible):
-
     r = random.sample(range(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT), 2)
 
     if not _random_accept(possible):
@@ -110,43 +103,11 @@ def image_resize(image, possible):
 
     w, h = image.size
     image = image.resize((int(w / 2), int(h / 2)), Image.ANTIALIAS)
-
     return image
 
 
-
-# def draw_img(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT):
-#     image = Image.open("multi_val/data/云QF5H7P_blue_False.jpg")
-#     #image.show()
-#
-#     # 在整张图上产生干扰点和线
-#     randome_intefer_line(image, POSSIBILITY_INTEFER, INTERFER_LINE_NUM, INTERFER_LINE_WIGHT)
-#     #image.show()
-#
-#     background_image = Image.open("data/background/1.jpg")
-#
-#     #plate = cv2.imread("multi_val/data/云QF5H7P_blue_False.jpg")
-#     #rotated = rotate(plate, 20, scale=1.0)
-#
-#     # rotated = image.rotate(20)
-#     # rotated = rotated.convert("RGBA")
-#     # rotated.show()
-#
-#     r = random.sample(range(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT), 2)
-#     background_image.paste(image, (r[0], r[1]))
-#     background_image.show()
-#
-#
-#
-#     # words_image = Image.new('RGB', (200, 100), (0,255,0))
-#     # draw = ImageDraw.Draw(words_image)
-#     # words_image.show()
-
-
-
-def main(bg_path, plate_path, data_txt_path):
+def main(bg_path, plate_path, data_txt_path, generator_path, generator_txt):
     files = os.listdir(bg_path)
-    #print(files)
     i = 0
     for file in os.listdir(data_txt_path):
         txt_path = os.path.join(data_txt_path + file)
@@ -155,83 +116,50 @@ def main(bg_path, plate_path, data_txt_path):
             image = Image.open(os.path.join(plate_path + file[:-4] + '.jpg'))
             # 在整张图上产生干扰点和线
             randome_intefer_line(image, POSSIBILITY_INTEFER, INTERFER_LINE_NUM, INTERFER_LINE_WIGHT)
-
             # 随机抽取汽车背景图片
             file = np.random.choice(files)
-            #print("file:",file)
             background_image = Image.open(os.path.join(bg_path + file))
-
             # 旋转
             background_image = rotate_bound(image, background_image, POSSIBILITY_ROTATE)
-
             # 压缩车牌
             background_image = image_resize(background_image, POSSIBILITY_RESIZE)
 
-
             i += 1
-            path = os.path.join("data/plate/" + str(i) + ".jpg")
+            path = os.path.join(generator_path + str(i) + ".jpg")
             background_image.save(path)
 
-            plate_txt = os.path.join("data/plate_txt/" + str(i) + ".txt")
+            plate_txt = os.path.join(generator_txt + str(i) + ".txt")
             with open(plate_txt, "w", encoding='utf-8') as f1:
                 f1.write(str(label))
 
 
 
 
-def test():
-    '''
-    随机抽取一张汽车背景图片，随机选择一张生成的车牌，将车牌旋转一定角度后贴在背景图片上，使生成的车牌更真实
-    :return:
-    '''
-    #path = "data/background/"
-    path = "multi_val/bg/"
-    files = os.listdir(path)
-    print(files)
-    file = np.random.choice(files)
-    print(file)
-    background_image = Image.open(os.path.join(path + file))
-
-    plate = Image.open("multi_val/data/云QF5H7P_blue_False.jpg")
-    print(plate.mode)
-
-    # 测试
-    # newImg = Image.new("RGBA", (140, 80),(0,255,0))
-    # out = newImg.rotate(10)
-    # r, g, b, a = out.split()
-    # background_image.paste(out, (30, 30), mask=a)
-    # background_image.show()
-    # out.save("multi_val/outImg.png", "PNG")
-
-
-    plate_con = plate.convert("RGBA")
-    p = Image.new('RGBA', (500, 200))
-    p.paste(plate_con, (10, 10))
-    p.show()
-    plate_r = p.rotate(-5)
-    plate_r.show()
-    # plate_r.save("multi_val/newImg1.png", "PNG")
-    # plate_r = Image.open("multi_val/newImg1.png")
-
-    r, g, b, a = plate_r.split()
-    background_image = Image.open(os.path.join(path + file))
-    background_image.paste(plate_r, (4, 0), mask=a)
-    #background_image.show()
-    background_image.save("multi_val/newImg.png", "PNG")
-
-
-
-
 if __name__ == "__main__":
-    # 测试
-    #test()
-    #draw_img(MIN_WIDTH_HEIGHT, MAX_WIDTH_HEIGHT)
+    bg_path = "data/bg/"              # 汽车背景图片路径
+    plate_path = "data/data/"         # 生成原始车牌路径
+    data_txt_path = "data/data_txt/"  # 生成原始车牌标签路径
+    generator_path = "data/plate/"    # 生成样本车牌路径
+    generator_txt = "data/plate_txt/" # 生成样本车牌标签路径
 
-    # 生成车牌
-    bg_path = "data/bg/"
-    plate_path = "data/data/"
-    data_txt_path = "data/data_txt/"
-
-    main(bg_path, plate_path, data_txt_path)
+    main(bg_path, plate_path, data_txt_path, generator_path, generator_txt)
     print("处理完成")
 
+
+
+## 测试
+# if __name__ == "__main__":
+#     path = "multi_val/bg/"
+#     files = os.listdir(path)
+#     file = np.random.choice(files)
+#     background_image = Image.open(os.path.join(path + file))
+#     plate = Image.open("multi_val/data/云QF5H7P_blue_False.jpg")
+#
+#     plate_con = plate.convert("RGBA")
+#     p = Image.new('RGBA', (500, 200))
+#     p.paste(plate_con, (10, 10))
+#     plate_r = p.rotate(-5)
+#
+#     r, g, b, a = plate_r.split()
+#     background_image.paste(plate_r, (4, 0), mask=a)
+#     background_image.save("multi_val/newImg.png", "PNG")

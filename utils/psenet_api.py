@@ -4,11 +4,12 @@ import requests
 import base64
 import cv2,os
 import logging
+import config
 import numpy as np
-#CFG = config.CFG
+CFG = config.CFG
 
 '''
-   调用local 系统OCR相关接口
+   调用local系统OCR车牌检测接口
 '''
 
 logger = logging.getLogger("OCR Utils")
@@ -24,52 +25,8 @@ def cv2_to_base64(image):
     return str(base64_str,"utf-8")
 
 
-# 处理将请求中的base64转成byte数组，注意，不是numpy数组
-def base64_2_bytes(base64_data):
-    logger.debug("Got image ,size:%d", len(base64_data))
-    # 去掉可能传过来的“data:image/jpeg;base64,”HTML tag头部信息
-
-    index = base64_data.find(",")
-    if index != -1: base64_data = base64_data[index + 1:]
-    # print(base64_data)
-    # 降base64转化成byte数组
-    buffer = base64.b64decode(base64_data)
-    logger.debug("Convert image to bytes by base64, lenght:%d", len(buffer))
-
-    return buffer
-
-
-def base64_2_image(base64_data):
-    data = base64_2_bytes(base64_data)
-    return bytes2image(data)
-
-
-# 从web的图片RGB的byte数组，转换成cv2的格式
-def bytes2image(buffer):
-    logger.debug("从web读取数据，长度:%r", len(buffer))
-
-    if len(buffer) == 0:
-        logger.error("图像解析失败，原因：长度为0")
-        return None
-
-    # 先给他转成ndarray(numpy的)
-    data_array = np.frombuffer(buffer, dtype=np.uint8)
-
-    # 从ndarray中读取图片，有raw数据变成一个图片GBR数据,出来的数据，其实就是有维度了，就是原图的尺寸，如160x70
-    image = cv2.imdecode(data_array, cv2.IMREAD_COLOR)
-
-    if image is None:
-        logger.error("图像解析失败")  # 有可能从字节数组解析成图片失败
-        return None
-
-    logger.debug("从字节数组变成图像的shape:%r", image.shape)
-
-    return image
-
-
 def detect(img_base64):
-    #url = CFG['local']['url'] + "/detect/detect.ajax"
-    url = "http://ai.creditease.corp/detect/detect.ajax"
+    url = CFG['local']['url'] + "detect/detect.ajax"
     post_data = {"img": img_base64,
                  "sid": "iamsid",
                  "do_verbose": False,
@@ -79,7 +36,7 @@ def detect(img_base64):
     response = requests.post(url, json=post_data, headers=headers)
     print("response:",response)
     data = response.json()
-    print('data:', data)
+    print("data:",data)
     return data
 
 
@@ -93,13 +50,11 @@ def order_points(image,pts):
 
     # 初始化坐标点
     rect = np.zeros((4, 2), dtype="float32")
-    print("pts:",pts)
 
     lists = []
     for p in pts:
         list1 = [p['x'], p['y']]
         lists.append(list1)
-    print("lists:",lists)
 
     pts = np.array(lists)
     # 获取左上角和右下角坐标点
@@ -107,8 +62,6 @@ def order_points(image,pts):
     rect[0] = pts[np.argmin(s)]
     rect[2] = pts[np.argmax(s)]
 
-    #print("rect[0]:",rect[0])
-    #print("rect[2]:", rect[2])
     # cv2.rectangle(image, (rect[0][0],rect[0][1]), (rect[2][0],rect[2][1]), (0, 0, 255), 3)
     # cv2.imwrite(os.path.join('data/debug.jpg'), image)
 
@@ -175,14 +128,12 @@ data: { 'code': '0',
      }
 '''
 
-def main(img,data,file):
-    image = base64_2_image(img)
+def main(image,data,file,psenet_plate):
     bboxes = data['detect_info']
 
     max_area = 0
     max_plate_image = None
     max_bbox = None
-    i = 0
     for bbox in bboxes:
         plate_image, area = crop_img_with_area(image, bbox)
         if area > max_area:
@@ -193,30 +144,26 @@ def main(img,data,file):
         if max_plate_image is None:
             logger.error("在图片中无法找到车牌")
 
-
-    img_path = os.path.join("data/psenet/" + file)
+    img_path = os.path.join(psenet_plate + file)
     cv2.imwrite(img_path, max_plate_image)
 
-    #cv2.imwrite("data/psenet.jpg", max_plate_image)
     return max_area, max_plate_image, max_bbox
-
-        # i = 0
-        # for image in plate_image:
-        #     i += 1
-        #     cv2.imwrite(os.path.join("data/psenet/" + str(i) + ".jpg"), image)
 
 
 
 if __name__ == '__main__':
-    files = os.listdir("data/problem_images/")
+    pb_image_path = "data/problem_images/"
+    psenet_plate = "data/psenet/"
+
+    files = os.listdir(pb_image_path)
     for file in files:
-        path = os.path.join("data/problem_images/" + file)
-        print("path:",path)
+        path = os.path.join(pb_image_path + file)
         img = cv2.imread(path)
         if img is not None:
             img_base64 = cv2_to_base64(img)
             data = detect(img_base64)
-            main(img_base64, data, file)
+            main(img, data, file, psenet_plate)
+
 
 
 # # 测试

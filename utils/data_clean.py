@@ -3,7 +3,7 @@
 import os
 
 '''
-     统计样本中车牌各个字符的次数
+     统计车牌样本中各个字符的次数
 '''
 
 def compare(txt, writePath):
@@ -12,7 +12,7 @@ def compare(txt, writePath):
     :return:
     '''
 
-    outfiile = open(writePath, 'a+', encoding='utf-8')
+    outfile = open(writePath, 'a+', encoding='utf-8')
     f = open(txt, 'r', encoding='utf-8')
     lines_seen = set()
 
@@ -21,7 +21,7 @@ def compare(txt, writePath):
         i += 1
         if len(line) > 1:
             if line not in lines_seen:
-                outfiile.write(line)
+                outfile.write(line)
                 lines_seen.add(line)
                 if i % 10 == 0:
                     print("已经处理行数：", i)
@@ -29,6 +29,12 @@ def compare(txt, writePath):
 
 
 def split_char(writePath,splitPath):
+    '''
+    文档行太多，直接统计时间复杂度太高，这里将一个文本文件进行拆分，分别存在不同的文件里
+    :param writePath:
+    :param splitPath:
+    :return:
+    '''
     f = open(writePath, 'r', encoding='utf-8')
     s = ""
     j = 0
@@ -47,7 +53,6 @@ def split_char(writePath,splitPath):
                     f1.write(s)
                     s = ""
 
-        #print("s:",s)
         path = os.path.join(splitPath + str(i+1) + ".txt")
         with open(path, "w", encoding='utf-8') as f2:
             f2.write(s)
@@ -58,40 +63,43 @@ def count_char(s):
     resoult = {}
     for i in s:
         resoult[i] = s.count(i)
-    print("resoult:",resoult)
 
     # 排序
     r_sort = sorted(resoult.items(), key=lambda x: x[1], reverse=True)
-    print("r_sort:",r_sort)
-
     return r_sort
 
 
 def main(splitPath,countPath):
+    '''
+    遍历拆分的文件，分别进行各个字符数量统计，保存在对应的文件里
+    :param splitPath:
+    :param countPath:
+    :return:
+    '''
     m = 0
     for file in os.listdir(splitPath):
         file_path = os.path.join(splitPath + file)
         f = open(file_path, "r", encoding="utf-8")
         line = f.readline()
-        #print("line:", line)
         r_sort = count_char(line)
 
         m += 1
         count_path = os.path.join(countPath + str(m) + ".txt")
         with open(count_path, "w", encoding="utf-8") as f1:
             for l in r_sort:
-                #print("l:",l)
                 list1 = list(l)
                 str1 = list1[0] + ' ' + str(list1[1])
                 f1.write(str1 + "\n")
 
 
 def merge_counts(counts_txt, countPath, char_txt):
+    '''
+    将每个文件里的字符统计个数进行合并统计，输出最终的各字符数量统计文件
+    :return:
+    '''
 
     all_counts = []
-    # with open(counts_txt, "r", encoding="utf-8") as f:
-    #
-    #     for line in f.readlines():
+
     for line in counts_txt:
         n = 0
         line = line.replace("\n", "")
@@ -117,7 +125,6 @@ def merge_counts(counts_txt, countPath, char_txt):
     print("处理完成")
 
 
-
 # def test1():
 #     with open("data/test_1.txt", "r", encoding="utf-8") as f:
 #         s = ""
@@ -141,31 +148,17 @@ def merge_counts(counts_txt, countPath, char_txt):
 #                 list1 = list(l)
 #                 str1 = list1[0] + ' ' + str(list1[1])
 #                 f1.write(str1 + "\n")
-#
-#
-#
-# def test():
-#     # 统计字符个数
-#     str = "苏E85QE8鄂AH72W2赣HA0696"
-#     resoult = {}
-#     for i in str:
-#         resoult[i] = str.count(i)
-#     print(resoult)
+
 
 
 
 if __name__ == "__main__":
-    # txt = 'data/ocr/train.txt'
-    # writePath = 'data/ocr/train_1.txt'
-    # splitPath = "data/ocr/split/"
-    # countPath = "data/ocr/count/"
-    # char_txt = "data/ocr/char_count.txt"
-
-    txt = 'data/pb_data/problem_plate.txt'
-    writePath = 'data/pb_data/problem_plate_1.txt'
-    splitPath = "data/pb_data/split/"
-    countPath = "data/pb_data/count/"
-    char_txt = "data/pb_data/char_count.txt"
+    # 服务器上的路径
+    txt = 'data/ocr/train.txt'
+    writePath = 'data/ocr/train_1.txt'
+    splitPath = "data/ocr/split/"
+    countPath = "data/ocr/count/"
+    char_txt = "data/ocr/char_count.txt"
 
     counts_txt = ["京", "津", "冀", "晋", "蒙", "辽", "吉", "黑", "沪","苏",
                   "浙", "皖", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂",
@@ -175,16 +168,16 @@ if __name__ == "__main__":
                   'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 
-    # 删除重复行
+    # 第一步：删除文档重复行
     compare(txt, writePath)
 
-    # 统计各个字符个数
+    # 第二步：统计各个字符个数
     split_char(writePath,splitPath)
 
-    # 分组统计放在不同txt文档
+    # 第三步：分组统计放在不同txt文档
     main(splitPath, countPath)
 
-    # 各字符统计求和
+    # 第四步：各字符统计求和
     merge_counts(counts_txt, countPath, char_txt)
 
     #测试

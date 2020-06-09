@@ -2,12 +2,14 @@ import numpy as np
 import cv2, os
 from glob import glob
 
-
 from plate_number import random_select, generate_plate_number_white, generate_plate_number_yellow_xue
 from plate_number import generate_plate_number_black_gangao, generate_plate_number_black_shi, generate_plate_number_black_ling
 from plate_number import generate_plate_number_blue_copy, generate_plate_number_yellow_gua
 from plate_number import letters, digits
 
+'''
+    生成蓝色车牌
+'''
 
 def get_location_data(length=7, split_id=1, height=140):
     location_xy = np.zeros((length, 4), dtype=np.int32)
@@ -262,8 +264,8 @@ if __name__ == '__main__':
     # 批量生成各种车牌
     from tqdm import tqdm
     for i in tqdm(range(1)):
-
         img_all, number_xy, gt_plate_numbers, bg_color, is_double = generator.generate_plate()
+
         for j,img in enumerate(img_all):
             gt_plate_number = gt_plate_numbers[j]
             cv2.imwrite('data/data/{}_{}_{}.jpg'.format(gt_plate_number, bg_color, is_double), img)
